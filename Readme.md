@@ -9,7 +9,7 @@
 * česky
 * jednotné číslo, všechno malým písmenem
 * snake case (př. nazev_databaze)
-### Názvy Modelů, kontrolerů a knihoven:
+### Modelů, kontrolerů, migrací, seederů a knihoven:
 * česky
 * pascal case (př. NazevModelu)
 ### Názvy Views:
