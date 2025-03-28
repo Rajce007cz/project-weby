@@ -15,7 +15,7 @@
 ### Názvy Views:
 * anglicky
 * camel case (př. mainPage)
-## Složky Views
+### Složky Views
 *  anglicky
 ### Názvy Rout:
 * anglicky
