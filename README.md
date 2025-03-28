@@ -6,15 +6,20 @@
 * Verze: 8.2.4
 ## Jazyk
 ### Databáze: 
-* česky
+* anglicky
 * jednotné číslo, všechno malým písmenem
-* snake case (př. nazev_databaze)
+* snake case (př. database_name)
 ### Modelů, kontrolerů, migrací, seederů a knihoven:
-* česky
-* pascal case (př. NazevModelu)
+* anglicky
+* pascal case (př. NewModel)
 ### Názvy Views:
-* česky
-* camel case (př. hlavniStrana)
+* anglicky
+* camel case (př. mainPage)
+## Složky Views
+*  anglicky
+### Názvy Rout:
+* anglicky
+* Kebab case (př. route-name)
 ### Názvy ostatních tříd, metod a proměnných:
-* česky
-* camel case (př. nazevTridy)
+* anglicky
+* camel case (př. getSomething)
