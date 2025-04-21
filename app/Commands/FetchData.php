@@ -15,6 +15,7 @@ class FetchData extends BaseCommand
 {
     protected $group       = 'F1';
     protected $name        = 'fetch:f1data';
+<<<<<<< HEAD
     protected $description = 'F1 data 2000-2024';
 
     protected function getPointsRules($year)
@@ -43,6 +44,9 @@ class FetchData extends BaseCommand
     return trim($snake, '_') . '.png';
 }
 
+=======
+    protected $description = 'Načte F1 data ze sezón 2000–2025 z Ergast API a uloží je do databáze.';
+>>>>>>> 71ff3cbf80942f182df94d5c7b50a3098cd990d3
 
     public function run(array $params)
     {
@@ -55,10 +59,19 @@ class FetchData extends BaseCommand
         $resultModel = new ResultModel();
 
         for ($year = 2000; $year <= 2025; $year++) {
+<<<<<<< HEAD
             CLI::write("Zpracovávání sezóny $year", 'yellow');
 
             $seasonModel->insert(['year' => $year]);
 
+=======
+            CLI::write("Zpracovávám sezónu $year", 'yellow');
+
+            // Uložit sezónu
+            $seasonModel->insert(['year' => $year]);
+
+            // Načti závody v sezóně
+>>>>>>> 71ff3cbf80942f182df94d5c7b50a3098cd990d3
             $res = $client->get("$year.json");
             $races = json_decode($res->getBody()->getContents(), true);
             $racesList = $races['MRData']['RaceTable']['Races'] ?? [];
@@ -66,8 +79,11 @@ class FetchData extends BaseCommand
             $driverStats = [];
             $teamStats = [];
 
+<<<<<<< HEAD
             $pointsRules = $this->getPointsRules($year);
 
+=======
+>>>>>>> 71ff3cbf80942f182df94d5c7b50a3098cd990d3
             foreach ($racesList as $race) {
                 $raceData = [
                     'season_year' => $year,
@@ -78,11 +94,19 @@ class FetchData extends BaseCommand
                 $raceModel->insert($raceData);
                 $raceId = $raceModel->getInsertID();
 
+<<<<<<< HEAD
+=======
+                // Výsledky závodu
+>>>>>>> 71ff3cbf80942f182df94d5c7b50a3098cd990d3
                 $resultsRes = $client->get("$year/{$race['round']}/results.json");
                 $results = json_decode($resultsRes->getBody()->getContents(), true);
                 $resultsList = $results['MRData']['RaceTable']['Races'][0]['Results'] ?? [];
 
                 foreach ($resultsList as $result) {
+<<<<<<< HEAD
+=======
+                    // Ulož jezdce
+>>>>>>> 71ff3cbf80942f182df94d5c7b50a3098cd990d3
                     $driver = $result['Driver'];
                     $driverData = [
                         'first_name' => $driver['givenName'],
@@ -96,6 +120,7 @@ class FetchData extends BaseCommand
                         ->where('last_name', $driverData['last_name'])
                         ->first();
 
+<<<<<<< HEAD
                     if ($existingDriver) {
                         $driverId = $existingDriver['id'];
                     } else {
@@ -106,6 +131,11 @@ class FetchData extends BaseCommand
                         $driverId = $driverModel->insert($driverData, true);
                     }
 
+=======
+                    $driverId = $existingDriver ? $existingDriver['id'] : $driverModel->insert($driverData, true);
+
+                    // Ulož tým
+>>>>>>> 71ff3cbf80942f182df94d5c7b50a3098cd990d3
                     $constructor = $result['Constructor'];
                     $teamData = [
                         'name'       => $constructor['name'],
@@ -115,13 +145,18 @@ class FetchData extends BaseCommand
                     $existingTeam = $teamModel->where('name', $teamData['name'])->first();
                     $teamId = $existingTeam ? $existingTeam['id'] : $teamModel->insert($teamData, true);
 
+<<<<<<< HEAD
                     $position = (int)$result['position'];
                     $points = $pointsRules[$position - 1] ?? 0;
 
+=======
+                    // Výsledek
+>>>>>>> 71ff3cbf80942f182df94d5c7b50a3098cd990d3
                     $resultModel->insert([
                         'race_id'   => $raceId,
                         'driver_id' => $driverId,
                         'team_id'   => $teamId,
+<<<<<<< HEAD
                         'position'  => $position,
                         'points'    => $points
                     ]);
@@ -141,10 +176,47 @@ class FetchData extends BaseCommand
                 $driverModel->update($id, [
                     'points' => $current['points'] + $stat['points'],
                     'win'    => $current['win'] + $stat['wins'],
+=======
+                        'position'  => $result['position'],
+                        'points'    => $result['points']
+                    ]);
+
+                    // Sbírej statistiky
+                    $driverKey = $driverId;
+                    $teamKey = $teamId;
+
+                    if (!isset($driverStats[$driverKey])) {
+                        $driverStats[$driverKey] = ['points' => 0, 'wins' => 0];
+                    }
+                    $driverStats[$driverKey]['points'] += floatval($result['points']);
+                    if ($result['position'] === '1') {
+                        $driverStats[$driverKey]['wins'] += 1;
+                    }
+
+                    if (!isset($teamStats[$teamKey])) {
+                        $teamStats[$teamKey] = ['points' => 0, 'wins' => 0, 'podiums' => 0];
+                    }
+                    $teamStats[$teamKey]['points'] += floatval($result['points']);
+                    if ($result['position'] === '1') {
+                        $teamStats[$teamKey]['wins'] += 1;
+                    }
+                    if (in_array($result['position'], ['1', '2', '3'])) {
+                        $teamStats[$teamKey]['podiums'] += 1;
+                    }
+                }
+            }
+
+            // Aktualizuj jezdce a týmy statistikami
+            foreach ($driverStats as $id => $stat) {
+                $driverModel->update($id, [
+                    'points' => $stat['points'],
+                    'win'    => $stat['wins'],
+>>>>>>> 71ff3cbf80942f182df94d5c7b50a3098cd990d3
                 ]);
             }
 
             foreach ($teamStats as $id => $stat) {
+<<<<<<< HEAD
                 $current = $teamModel->find($id);
                 $teamModel->update($id, [
                     'points'  => $current['points'] + $stat['points'],
@@ -154,6 +226,16 @@ class FetchData extends BaseCommand
             }
 
             // WDC
+=======
+                $teamModel->update($id, [
+                    'points'  => $stat['points'],
+                    'wins'    => $stat['wins'],
+                    'podiums' => $stat['podiums'],
+                ]);
+            }
+
+            // WDC = jezdec s nejvíce body
+>>>>>>> 71ff3cbf80942f182df94d5c7b50a3098cd990d3
             arsort($driverStats);
             $wdcId = array_key_first($driverStats);
             if ($wdcId) {
@@ -161,7 +243,11 @@ class FetchData extends BaseCommand
                 $driverModel->update($wdcId, ['wdc' => $driver['wdc'] + 1]);
             }
 
+<<<<<<< HEAD
             // WCC
+=======
+            // WCC = tým s nejvíce body
+>>>>>>> 71ff3cbf80942f182df94d5c7b50a3098cd990d3
             arsort($teamStats);
             $wccId = array_key_first($teamStats);
             if ($wccId) {
@@ -170,6 +256,10 @@ class FetchData extends BaseCommand
             }
         }
 
+<<<<<<< HEAD
         CLI::write('Data byla úspěšně uložena.', 'green');
+=======
+        CLI::write('✅ Hotovo! Data byla úspěšně uložena.', 'green');
+>>>>>>> 71ff3cbf80942f182df94d5c7b50a3098cd990d3
     }
 }
