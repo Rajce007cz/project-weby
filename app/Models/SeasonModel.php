@@ -5,7 +5,7 @@ use CodeIgniter\Model;
 
 class SeasonModel extends Model
 {
-    protected $table      = 'f1_seasons'; // přidání prefixu 'f1_'
+    protected $table      = 'f1_seasons';
     protected $primaryKey = 'year';
 
     protected $allowedFields = ['year', 'description'];

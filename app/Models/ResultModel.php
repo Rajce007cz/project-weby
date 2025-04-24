@@ -5,7 +5,7 @@ use CodeIgniter\Model;
 
 class ResultModel extends Model
 {
-    protected $table      = 'f1_results'; // přidání prefixu 'f1_'
+    protected $table      = 'f1_results';
     protected $primaryKey = 'id';
 
     protected $allowedFields = ['race_id', 'driver_id', 'team_id', 'position', 'points'];

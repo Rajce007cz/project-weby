@@ -5,7 +5,7 @@ use CodeIgniter\Model;
 
 class RaceModel extends Model
 {
-    protected $table      = 'f1_races'; // přidání prefixu 'f1_'
+    protected $table      = 'f1_races';
     protected $primaryKey = 'id';
 
     protected $allowedFields = ['name', 'country', 'date', 'season_year'];
