@@ -10,4 +10,7 @@ class DriverModel extends Model
 
     protected $allowedFields = ['first_name', 'last_name', 'nationality', 'dob', 'points', 'win', 'wdc', 'image'];
     protected $useTimestamps = false;
+    protected $useSoftDeletes = true;
+    protected $deletedField   = 'deleted_at';
+    
 }

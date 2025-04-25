@@ -14,3 +14,6 @@ $routes->post('/drivers/update/(:num)', 'DriverController::update/$1');
 $routes->get('/drivers/delete/(:num)', 'DriverController::delete/$1');
 $routes->get('/seasons', 'SeasonController::index');
 $routes->get('/seasons/(:num)', 'SeasonController::show/$1');
+$routes->get('/drivers/trashed', 'DriverController::trashed');
+$routes->get('/drivers/restore/(:num)', 'DriverController::restore/$1');
+$routes->get('/drivers/forceDelete/(:num)', 'DriverController::forceDelete/$1');
