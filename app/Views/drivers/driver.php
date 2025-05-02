@@ -35,7 +35,9 @@ $this->section("content");
                 </div>                 
             </div>  
         </div>    
+        
     <?php endforeach; ?>  
+            <?php echo $pager->links();?>
 </div>
 
 <?php 

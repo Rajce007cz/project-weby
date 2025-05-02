@@ -7,11 +7,17 @@ use CodeIgniter\Controller;
 
 class DriverController extends Controller
 {
+    var $model;
+    var $cofig;
+    public function __construct(){
+        $this->model = new DriverModel();
+        $this->config = new \Config\MyConfig();
+    }
     public function index()
     {
-        $model = new DriverModel();
-        $data['drivers'] = $model->orderBy('points', 'DESC')->findAll();
-
+        $cardNumber =  $this->config->itemsForPage;
+        $data['drivers'] = $this->model->orderBy('points', 'DESC')->paginate($cardNumber);
+        $data["pager"] = $this->model->pager;
         return view('drivers/driver', $data);
     }
 
@@ -23,8 +29,6 @@ class DriverController extends Controller
     public function store()
     {
         helper('text');
-        $model = new DriverModel();
-
         $firstName = $this->request->getPost('first_name');
         $lastName = $this->request->getPost('last_name');
 
@@ -46,8 +50,7 @@ class DriverController extends Controller
 
     public function edit($id)
     {
-        $model = new DriverModel();
-        $data['driver'] = $model->find($id);
+        $data['driver'] = $this->model->find($id);
 
         return view('drivers/edit', $data);
     }
@@ -55,7 +58,6 @@ class DriverController extends Controller
     public function update($id)
     {
         helper('text');
-        $model = new DriverModel();
 
         $firstName = $this->request->getPost('first_name');
         $lastName = $this->request->getPost('last_name');
@@ -76,59 +78,41 @@ class DriverController extends Controller
         return redirect()->to('/drivers');
     }
 
-    // Soft delete
+    // Soft delete, ten neupravujte
     public function delete($id)
 {
-    $model = new DriverModel();
-
-    // Použijeme soft delete místo trvalého smazání
-    $driver = $model->find($id);
-
+    $driver = $this->model->find($id);
     if ($driver) {
-        $model->delete($id); // Soft delete, nastaví `deleted_at` na aktuální datum a čas
+        $this->model->delete($id);
         return redirect()->to('/drivers');
     } else {
-        // Pokud není řidič nalezen
-        return redirect()->to('/drivers')->with('error', 'Řidič nenalezen.');
+        return redirect()->to('/drivers')->with('error', 'Řidič nebyl nalezen.');
     }
 }
-
-    // Zobrazit smazané (soft deleted)
     public function trashed()
     {
-        $model = new DriverModel();
-        $data['drivers'] = $model->onlyDeleted()->orderBy('points', 'DESC')->findAll();
+        $data['drivers'] = $this->model->onlyDeleted()->orderBy('points', 'DESC')->findAll();
 
         return view('drivers/trashed', $data);
     }
 
-    // Obnovit smazaného řidiče
     public function restore($id)
 {
-    $model = new DriverModel();
-
-    // Najdeme smazaného řidiče
-    $driver = $model->onlyDeleted()->find($id);
-
+    $driver = $this->model->onlyDeleted()->find($id);
     if ($driver) {
-        // Obnovíme řidiče tím, že ručně nastavíme `deleted_at` na NULL
-        $builder = $model->builder();
+        $builder = $this->model->builder();
         $builder->where('id', $id);
-        $builder->update(['deleted_at' => null]);  // Nastavíme `deleted_at` na null
+        $builder->update(['deleted_at' => null]);
 
         return redirect()->to('/drivers/trashed');
     } else {
-        // Pokud řidič neexistuje nebo není smazaný
         return redirect()->to('/drivers/trashed')->with('error', 'Tento řidič byl trvale smazán nebo neexistuje.');
     }
 }
 
-    // Trvale smazat (hard delete)
     public function forceDelete($id)
     {
-        $model = new DriverModel();
-        $model->delete($id, true); // true = permanent delete
-
+        $this->model->delete($id, true);
         return redirect()->to('/drivers/trashed');
     }
 }
