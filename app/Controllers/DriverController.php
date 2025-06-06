@@ -28,7 +28,6 @@ class DriverController extends Controller
 
     public function store()
     {
-        helper('text');
         $firstName = $this->request->getPost('first_name');
         $lastName = $this->request->getPost('last_name');
 
@@ -57,7 +56,6 @@ class DriverController extends Controller
 
     public function update($id)
     {
-        helper('text');
 
         $firstName = $this->request->getPost('first_name');
         $lastName = $this->request->getPost('last_name');
@@ -67,7 +65,7 @@ class DriverController extends Controller
         $image = preg_replace('/[^a-z0-9]+/', '_', $image);
         $image = trim($image, '_') . '.png';
 
-        $model->update($id, [
+        $this->model->update($id, [
             'first_name'  => $firstName,
             'last_name'   => $lastName,
             'nationality' => $this->request->getPost('nationality'),
@@ -106,7 +104,7 @@ class DriverController extends Controller
 
         return redirect()->to('/drivers/trashed');
     } else {
-        return redirect()->to('/drivers/trashed')->with('error', 'Tento řidič byl trvale smazán nebo neexistuje.');
+        return redirect()->to('/drivers/trashed')->with('error', 'Tento řidič byl trvale smazán.');
     }
 }
 
