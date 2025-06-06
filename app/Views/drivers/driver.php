@@ -10,34 +10,37 @@ $this->section("content");
                 </nav>
 <h2>F1 Drivers</h2>
 
+<?php if (session()->get('user_id')): ?>
 <div style="margin-bottom: 15px;">
     <a href="<?= base_url("/drivers/create"); ?>">+ Add Driver</a> | 
     <a href="<?= base_url("/drivers/trashed"); ?>"> Deleted drivers</a>
 </div>
+<?php endif; ?>
 
 <div class="row">
     <?php foreach ($drivers as $d): ?>
-        <div class="col-4">
-            <div class="card">
+        <div class="col-4 p-3">
+            <div class="card h-100">
                 <div class="card-body">
                     <h5 class="card-title"><?= esc($d['first_name'] . ' ' . $d['last_name']) ?></h5>
-                    <img class="card-img-top" src="<?= base_url("images/" . esc($d['image'])); ?>"
+                    <img class="card-img-top" style="height: 200px; object-fit: cover;"  src="<?= base_url("images/" . esc($d['image'])); ?>"
                          onerror="this.onerror=null; this.src='/images/drivers/default.png';">
                     <p class="card-text"><strong>WDC:</strong> <?= esc($d['wdc']) ?></p>
                     <p class="card-text"><strong>Wins:</strong> <?= esc($d['win']) ?></p>
                     <p class="card-text"><strong>Points:</strong> <?= esc($d['points']) ?></p>
                     <p class="card-text"><strong>Nationality:</strong> <?= esc($d['nationality']) ?></p>
                     <p class="card-text"><strong>Date of birth:</strong> <?= esc($d['dob']) ?></p>
+                    <?php if (session()->get('user_id')): ?>
                     <div class="card-actions">
                         <a href="<?= base_url("/drivers/edit/" . $d['id']); ?>">Edit</a> |
                         <a href="<?= base_url("/drivers/delete/" . $d['id']); ?>" onclick="return confirm('Delete this driver?')">Delete</a>
                     </div>
+                    <?php endif; ?>
                 </div>                 
             </div>  
-        </div>    
-        
+        </div>      
     <?php endforeach; ?>  
-            <?php echo $pager->links();?>
+            <?php echo $pager->links()?>
 </div>
 
 <?php 

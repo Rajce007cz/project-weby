@@ -19,10 +19,12 @@ $this->section("content");
                              onerror="this.onerror=null; this.src='/images/drivers/default.png';">
                         <p class="card-text"><strong>Nationality:</strong> <?= esc($d['nationality']) ?></p>
                         <p class="card-text"><strong>Date of birth:</strong> <?= esc($d['dob']) ?></p>
+                        <?php if (session()->get('user_id')): ?>
                         <div class="card-actions">
                             <a href="<?= base_url("/drivers/restore/" . $d['id']); ?>">Restore</a> |
                             <a href="<?= base_url("/drivers/forceDelete/" . $d['id']); ?>" onclick="return confirm('Opravdu trvale smazat?')">Delete</a>
                         </div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>    

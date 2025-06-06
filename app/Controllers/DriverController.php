@@ -113,4 +113,57 @@ class DriverController extends Controller
         $this->model->delete($id, true);
         return redirect()->to('/drivers/trashed');
     }
+    
+    public function show($id)
+{
+    $driverModel = new DriverModel();
+    $driver = $driverModel->find($id);
+
+    if (!$driver) {
+        throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Jezdec nenalezen.");
+    }
+
+    $db = \Config\Database::connect();
+
+    // Výsledky sezón pro daného jezdce
+    $builder = $db->table('results r');
+    $builder->select('s.year, SUM(r.points) AS season_points, COUNT(CASE WHEN r.position = 1 THEN 1 END) AS season_wins');
+    $builder->join('races ra', 'ra.id = r.race_id');
+    $builder->join('seasons s', 's.year = ra.season_year');
+    $builder->where('r.driver_id', $id);
+    $builder->groupBy('s.year');
+    $builder->orderBy('s.year', 'DESC');
+    $seasonResults = $builder->get()->getResultArray();
+
+    // Získání pořadí v každé sezóně
+    foreach ($seasonResults as &$season) {
+        $year = $season['year'];
+
+        // Získáme všechny jezdce + jejich body v daném roce
+        $rankingBuilder = $db->table('results r');
+        $rankingBuilder->select('r.driver_id, SUM(r.points) AS total_points');
+        $rankingBuilder->join('races ra', 'ra.id = r.race_id');
+        $rankingBuilder->where('ra.season_year', $year);
+        $rankingBuilder->groupBy('r.driver_id');
+        $rankingBuilder->orderBy('total_points', 'DESC');
+
+        $allDrivers = $rankingBuilder->get()->getResultArray();
+
+        // Najdeme pozici tohoto jezdce
+        $position = 1;
+        foreach ($allDrivers as $d) {
+            if ($d['driver_id'] == $id) {
+                break;
+            }
+            $position++;
+        }
+
+        $season['season_position'] = $position; // přidáme do výstupu
+    }
+
+    return view('drivers/driver_details', [
+        'driver'         => $driver,
+        'seasonResults'  => $seasonResults
+    ]);
+}
 }
