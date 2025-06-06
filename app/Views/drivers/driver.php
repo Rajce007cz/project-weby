@@ -22,7 +22,8 @@ $this->section("content");
         <div class="col-4 p-3">
             <div class="card h-100">
                 <div class="card-body">
-                    <h5 class="card-title"><?= esc($d['first_name'] . ' ' . $d['last_name']) ?></h5>
+                    <h5 class="card-title"><a href="<?= base_url("/drivers/driver_details/" . $d['id']); ?>">
+                    <?= esc($d['first_name']) . ' ' . esc($d['last_name']) ?></a></h5>
                     <img class="card-img-top" style="height: 200px; object-fit: cover;"  src="<?= base_url("images/" . esc($d['image'])); ?>"
                          onerror="this.onerror=null; this.src='/images/drivers/default.png';">
                     <p class="card-text"><strong>WDC:</strong> <?= esc($d['wdc']) ?></p>
