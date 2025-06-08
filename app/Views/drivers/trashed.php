@@ -2,6 +2,11 @@
 $this->extend("layout/layout");
 $this->section("content"); 
 ?>
+<ol class="breadcrumb mt-4">
+  <li class="breadcrumb-item"><a href="/">Home</a></li>
+  <li class="breadcrumb-item"><a href="/drivers">Drivers</a></li>
+  <li class="breadcrumb-item active">Deleted Drivers</li>
+</ol>
 <h2>Deleted drivers</h2>
 
 <div style="margin-bottom: 15px;">

@@ -14,14 +14,29 @@ class AuthController extends BaseController
 
     public function processRegister()
     {
-        $userModel = new UserModel();
+    helper(['form']);
 
-        $data = $this->request->getPost();
-        $userModel->save([
-            'username' => $data['username'],
-            'email'    => $data['email'],
-            'password' => password_hash($data['password'], PASSWORD_DEFAULT),
+    $rules = [
+        'username'         => 'required|min_length[3]|max_length[50]',
+        'email'            => 'required|valid_email|is_unique[users.email]',
+        'password'         => 'required|min_length[6]',
+        'password_confirm' => 'required|matches[password]'
+    ];
+
+    if (!$this->validate($rules)) {
+        return view('auth/register', [
+            'validation' => $this->validator
         ]);
+    }
+
+    $userModel = new UserModel();
+    $data = $this->request->getPost();
+
+    $userModel->save([
+        'username' => $data['username'],
+        'email'    => $data['email'],
+        'password' => password_hash($data['password'], PASSWORD_DEFAULT),
+    ]);
 
         return redirect()->to('/login');
     }
@@ -35,7 +50,7 @@ class AuthController extends BaseController
     {
         $userModel = new UserModel();
         $data = $this->request->getPost();
-        $user = $userModel->where('username', $data['username'])->first();
+        $user = $userModel->where('username', $data['usernameOrEmail'])->orWhere('email', $data['usernameOrEmail'])->first();
 
         if ($user && password_verify($data['password'], $user['password'])) {
             session()->set('user_id', $user['id']);

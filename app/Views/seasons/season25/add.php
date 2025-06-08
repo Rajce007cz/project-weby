@@ -1,79 +1,91 @@
-<!DOCTYPE html><html><head>
-    <title>Přidat závod – 2025</title>
+<?= $this->extend("layout/layout") ?>
+<?= $this->section("content") ?>
 
-    <!-- select2 CDN -->
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <style> th,td {padding:4px} </style>
-</head><body>
+<ol class="breadcrumb mt-4">
+  <li class="breadcrumb-item"><a href="/">Home</a></li>
+  <li class="breadcrumb-item"><a href="/seasons/season25">Season 2025</a></li>
+  <li class="breadcrumb-item active">Add 2025 Race</li>
+</ol>
+<h2 class="mb-4 mt-3">Add race to 2025 F1 Season</h2>
 
-<h2>Přidat závod – sezóna 2025</h2>
-
-<form method="post">
+<form method="post" class="w-75 mx-auto">
     <?= csrf_field() ?>
 
-    <p>
-        <label>Date&nbsp;
-            <input type="date" name="date" required>
-        </label>
-        &nbsp;
-        <label>Country&nbsp;
-            <input type="text" name="country" required>
-        </label>
-    </p>
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <label for="date" class="form-label">Date</label>
+            <input type="date" id="date" name="date" class="form-control" required>
+        </div>
 
-    <p>
-        <label>Race Name&nbsp;
-            <select id="race_name" name="race_name" style="width:300px" required>
-    <option></option>
-    <?php foreach ($raceNames as $raceName): ?>
-        <option value="<?= esc($raceName) ?>"><?= esc($raceName) ?></option>
-    <?php endforeach; ?>
-</select>
-        </label>
-    </p>
+        <div class="col-md-4">
+            <label for="country" class="form-label">Country</label>
+            <select id="country" name="country" class="form-select" required>
+                <option value=""></option>
+                <?php foreach ($raceCountries as $country): ?>
+                    <option value="<?= esc($country) ?>"><?= esc($country) ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
 
-    <h3>Positions 1-20</h3>
-    <table>
-        <thead>
-            <tr>
-                <th>Position</th><th>Driver</th><th>Team</th><th>Points</th>
-            </tr>
-        </thead>
-        <tbody>
-        <?php for($i=1;$i<=20;$i++): ?>
-            <tr>
-                <td>
-                    <?= $i ?>
-                    <input type="hidden" name="position[]" value="<?= $i ?>">
-                </td>
-                <td>
-                    <select class="driver-select" name="driver_id[]" style="width:180px">
-                        <option value="">–</option>
-                        <?php foreach ($drivers as $d): ?>
-                            <option value="<?= $d['id'] ?>">
-                                <?= esc($d['last_name'].' '.$d['first_name']) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </td>
-                <td>
-                    <select class="team-select" name="team_id[]" style="width:150px">
-                        <option value="">–</option>
-                        <?php foreach ($teams as $t): ?>
-                            <option value="<?= $t['id'] ?>"><?= esc($t['name']) ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </td>
-                <td><input type="number" name="points[]" step="0.5" min="0" style="width:70px"></td>
-            </tr>
-        <?php endfor; ?>
-        </tbody>
-    </table>
+        <div class="col-md-4">
+            <label for="race_name" class="form-label">Race Name</label>
+            <select id="race_name" name="race_name" class="form-select" required>
+                <option value=""></option>
+                <?php foreach ($raceNames as $raceName): ?>
+                    <option value="<?= esc($raceName) ?>"><?= esc($raceName) ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+    </div>
 
-    <p><button type="submit">Save race</button>
-       <a href="<?= base_url('seasons/season25') ?>">Back</a></p>
+    <h3 class="mb-3">Positions 1-20</h3>
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Position</th>
+                    <th>Driver</th>
+                    <th>Team</th>
+                    <th>Points</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php for ($i = 1; $i <= 20; $i++): ?>
+                    <tr>
+                        <td>
+                            <?= $i ?>
+                            <input type="hidden" name="position[]" value="<?= $i ?>">
+                        </td>
+                        <td>
+                            <select class="form-select driver-select" name="driver_id[]" style="width: 180px;">
+                                <option value="">–</option>
+                                <?php foreach ($drivers as $d): ?>
+                                    <option value="<?= $d['id'] ?>"><?= esc($d['last_name'] . ' ' . $d['first_name']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </td>
+                        <td>
+                            <select class="form-select team-select" name="team_id[]" style="width: 150px;">
+                                <option value="">–</option>
+                                <?php foreach ($teams as $t): ?>
+                                    <option value="<?= $t['id'] ?>"><?= esc($t['name']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </td>
+                        <td>
+                            <input type="number" name="points[]" step="0.5" min="0" class="form-control" style="width: 70px;">
+                        </td>
+                    </tr>
+                <?php endfor; ?>
+            </tbody>
+        </table>
+    </div>
+
+
+    <div class="mb-3">
+        <button type="submit" class="btn btn-primary">Save race</button>
+        <a href="<?= base_url('seasons/season25') ?>" class="btn btn-secondary ms-2">Back</a>
+    </div>
 </form>
 
 <script>
@@ -83,5 +95,4 @@ $(function () {
     $('.team-select').select2({placeholder:'Tým',allowClear:true});
 });
 </script>
-
-</body></html>
+<?= $this->endSection() ?>

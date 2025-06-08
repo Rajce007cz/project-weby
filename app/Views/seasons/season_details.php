@@ -1,6 +1,12 @@
 <?php
 $this->extend("layout/layout");
 $this->section("content"); ?>
+<ol class="breadcrumb mt-4">
+  <li class="breadcrumb-item"><a href="/">Home</a></li>
+  <li class="breadcrumb-item"><a href="/seasons">Seasons</a></li>
+  <li class="breadcrumb-item active">Season details</li>
+</ol>
+<div class="container mt-5">
 <h2>Sezóna <?= esc($season['year']) ?></h2>
 
 <p><?= esc($season['description']) ?></p>
@@ -58,6 +64,7 @@ $this->section("content"); ?>
         <?php endforeach; ?>
     </tbody>
 </table>
+</div>
 
 
 <a href="<?=base_url("/seasons");?>">Back</a>

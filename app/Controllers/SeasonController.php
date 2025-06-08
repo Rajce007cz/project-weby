@@ -18,12 +18,51 @@ class SeasonController extends Controller
         $this->db = \Config\Database::connect();
     }
 
-    public function index()
-    {
-        $seasons = $this->seasonModel->orderBy('year', 'DESC')->findAll();
+  public function index()
+{
+    $seasons = $this->seasonModel->orderBy('year', 'DESC')->findAll();
 
-        return view('seasons/season', ['seasons' => $seasons]);
+    $seasonData = [];
+
+    foreach ($seasons as $season) {
+        $year = $season['year'];
+
+        // Vítězný jezdec
+        $topDriver = $this->db->table('results r')
+            ->select('d.first_name, d.last_name, SUM(r.points) AS points')
+            ->join('drivers d', 'd.id = r.driver_id')
+            ->join('races ra', 'ra.id = r.race_id')
+            ->where('ra.season_year', $year)
+            ->groupBy('d.id')
+            ->orderBy('points', 'DESC')
+            ->limit(1)
+            ->get()
+            ->getRow();
+
+        // Vítězný tým
+        $topTeam = $this->db->table('results r')
+            ->select('t.name, SUM(r.points) AS points')
+            ->join('teams t', 't.id = r.team_id')
+            ->join('races ra', 'ra.id = r.race_id')
+            ->where('ra.season_year', $year)
+            ->groupBy('t.id')
+            ->orderBy('points', 'DESC')
+            ->limit(1)
+            ->get()
+            ->getRow();
+
+        $seasonData[] = [
+            'year'        => $year,
+            'winner'      => $topDriver ? "{$topDriver->first_name} {$topDriver->last_name}" : '–',
+            'team'        => $topTeam ? $topTeam->name : '–',
+            'points'      => $topDriver->points ?? 0,
+            'team_points' => $topTeam->points ?? 0,
+        ];
     }
+
+    return view('seasons/season', ['seasonData' => $seasonData]);
+}
+
 
     public function show($year)
     {
@@ -33,22 +72,6 @@ class SeasonController extends Controller
             throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Sezóna $year nenalezena");
         }
 
-        /* Dotaz na výsledky jezdců v dané sezóně
-        $builder = $this->db->table('results');//, SUM(results.points) as total_points, SUM(results.position = 1) as wins
-        $builder->select('drivers.id, drivers.first_name, drivers.last_name, teams.name as team_name');
-        $builder->join('drivers', 'drivers.id = results.driver_id');
-        $builder->join('teams', 'teams.id = results.team_id');
-        $builder->join('races', 'races.id = results.race_id');
-        $builder->where('races.season_year', $year);
-        $builder->groupBy('drivers.id');
-        $builder->orderBy('total_points', 'DESC');
-
-        $drivers = $builder->get()->getResultArray();
-
-        return view('seasons/season_details', [
-            'season' => $season,
-            'drivers' => $drivers,
-        ]);*/
     $builder = $this->resultModel->builder('results r');
     $builder->select('
         d.id,
@@ -85,6 +108,14 @@ class SeasonController extends Controller
 
     $seasonModel = new \App\Models\SeasonModel();
     $season = $seasonModel->where('year', $year)->first();
+
+    foreach ($results as &$row) {
+    $row['total_points'] = (int)$row['total_points'];
+}
+foreach ($teamResults as &$teamRow) {
+    $teamRow['total_points'] = (int)$teamRow['total_points'];
+}
+
 
     return view('seasons/season_details', [
         'year' => $year,

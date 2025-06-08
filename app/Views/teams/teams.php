@@ -2,6 +2,10 @@
 $this->extend("layout/layout");
 $this->section("content"); 
 ?>
+<ol class="breadcrumb mt-4">
+  <li class="breadcrumb-item"><a href="/">Home</a></li>
+  <li class="breadcrumb-item active">Teams</li>
+</ol>
     <div class="container mt-5">
         <h1 class="mb-4">Teams</h1>
         <table class="table table-striped">

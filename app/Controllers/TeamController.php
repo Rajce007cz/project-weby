@@ -62,15 +62,21 @@ class TeamController extends BaseController
 
     // Přeskládání dat do pivotní tabulky
     $resultsByDriver = [];
-    $driverNames = [];
+$driverNames = [];
 
-    foreach ($rawResults as $row) {
-        $resultsByDriver[$row['driver_id']][$row['race_id']] = [
-            'points' => $row['points'],
-            'position' => $row['position'],
-            ];
-        $driverNames[$row['driver_id']] = $row['first_name'] . ' ' . $row['last_name'];
-    }
+foreach ($rawResults as $row) {
+    $resultsByDriver[$row['driver_id']][$row['race_id']] = [
+        'points' => (int)$row['points'],  // tady přetypování na int
+        'position' => $row['position'],
+    ];
+    $driverNames[$row['driver_id']] = $row['first_name'] . ' ' . $row['last_name'];
+}
+
+// Ořezání desetin u total_points
+foreach ($seasonResults as &$row) {
+    $row['total_points'] = (int)$row['total_points'];
+}
+    
 
     return view('teams/seasons', [
         'team' => $team,

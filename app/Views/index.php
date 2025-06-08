@@ -1,10 +1,10 @@
 <?php
 $this->extend("layout/layout");
 $this->section("content"); ?>
-<body class="bg-dark text-white d-flex justify-content-center align-items-center vh-100">
-
-    <h1 class="display-1 text-center text-white p-5">The End</h1>
-
-</body>
+<ol class="breadcrumb mt-4">
+  <li class="breadcrumb-item active">Home</li>
+</ol>
+<h1 class="text-center mt-5">F1 Web project</h1>
+<p class="text-center mt-4">Database project from 2000 to 2025</p>
 <?php 
   $this->endSection();?>

@@ -21,6 +21,7 @@ class DriversTable extends Migration
             'win' => ['type' => 'INT', 'constraint' => 11],
             'wdc' => ['type' => 'INT', 'constraint' => 11],
             'image' => ['type' => 'VARCHAR', 'constraint' => 255],
+            'deleted_at' => ['type' => 'DATETIME', 'constraint' => 6],
         ]);
         $this->forge->addPrimaryKey('id');
         $this->forge->createTable('drivers');

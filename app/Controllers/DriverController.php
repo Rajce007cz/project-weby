@@ -12,23 +12,38 @@ class DriverController extends Controller
     public function __construct(){
         $this->model = new DriverModel();
         $this->config = new \Config\MyConfig();
+        helper('date');
     }
     public function index()
-    {
-        $cardNumber =  $this->config->itemsForPage;
-        $data['drivers'] = $this->model->orderBy('points', 'DESC')->paginate($cardNumber);
-        $data["pager"] = $this->model->pager;
-        return view('drivers/driver', $data);
-    }
+{
+    $perPage = $this->config->itemsForPage;
 
+    $data['drivers'] = $this->model->orderBy('points', 'DESC')->paginate($perPage);
+    $data['pager'] = $this->model->pager;
+    $data['currentPage'] = $this->model->pager->getCurrentPage();
+    $data['totalPages'] = $this->model->pager->getPageCount();
+
+    return view('drivers/driver', $data);
+}
     public function create()
     {
         return view('drivers/create');
     }
 
     public function store()
-    {
-        $firstName = $this->request->getPost('first_name');
+{
+    helper('form');
+
+    // Validace
+    $validation = \Config\Services::validation();
+    $validation->setRules([
+        'first_name'  => 'required|min_length[2]',
+        'last_name'   => 'required|min_length[2]',
+        'nationality' => 'required',
+        'dob'         => 'required|valid_date',
+    ]);
+
+    $firstName = $this->request->getPost('first_name');
         $lastName = $this->request->getPost('last_name');
 
         $image = strtolower($firstName . '_' . $lastName);
@@ -36,16 +51,25 @@ class DriverController extends Controller
         $image = preg_replace('/[^a-z0-9]+/', '_', $image);
         $image = trim($image, '_') . '.png';
 
-        $model->save([
-            'first_name'  => $firstName,
-            'last_name'   => $lastName,
-            'nationality' => $this->request->getPost('nationality'),
-            'dob'         => $this->request->getPost('dob'),
-            'image'       => $image,
-        ]);
-
-        return redirect()->to('/drivers');
+    if (!$validation->withRequest($this->request)->run()) {
+        return redirect()->back()
+                         ->withInput()
+                         ->with('errors', $validation->getErrors());
     }
+
+    $driverModel = new \App\Models\DriverModel();
+
+    $driverModel->insert([
+        'first_name'  => $this->request->getPost('first_name'),
+        'last_name'   => $this->request->getPost('last_name'),
+        'nationality' => $this->request->getPost('nationality'),
+        'dob'         => $this->request->getPost('dob'),
+        'image'       => $image,
+    ]);
+
+    return redirect()->to('/drivers')->with('message', 'Driver added successfully.');
+}
+
 
     public function edit($id)
     {
@@ -116,6 +140,7 @@ class DriverController extends Controller
     
     public function show($id)
 {
+    helper('date');
     $driverModel = new DriverModel();
     $driver = $driverModel->find($id);
 
@@ -134,6 +159,10 @@ class DriverController extends Controller
     $builder->groupBy('s.year');
     $builder->orderBy('s.year', 'DESC');
     $seasonResults = $builder->get()->getResultArray();
+
+    foreach ($seasonResults as &$season) {
+    $season['season_points'] = (int)$season['season_points'];
+}
 
     // Získání pořadí v každé sezóně
     foreach ($seasonResults as &$season) {
